@@ -348,3 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# idea
+assist/annotation/.idea/*
+
+# third-party
+third-party/*

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <GSDir>$(SolutionDir)..\</GSDir>
+    <GSSrcDir>$(GSDir)src\</GSSrcDir>
+    <GSBuildDir>$(GSDir)build\</GSBuildDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(GSBuildDir)bin\</OutDir>
+    <IntDir>$(GSBuildDir)inter\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <BuildLog>
+      <Path>$(GSBuildDir)inter\$(ProjectName)\$(Configuration)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(GSSrcDir);$(GSDir)third-party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GLOG_NO_ABBREVIATED_SEVERITIES;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(GSBuildDir)bin\$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(GSBuildDir)bin\$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalDependencies>yaml-cppd.lib;gflags_debug.lib;glogd.lib;libgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GSDir)third-party\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GSDir">
+      <Value>$(GSDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GSSrcDir">
+      <Value>$(GSSrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GSBuildDir">
+      <Value>$(GSBuildDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
