@@ -1,0 +1,5 @@
+add_subdirectory(core)
+add_subdirectory(logic)
+add_subdirectory(third-party)
+add_subdirectory(config)
+add_subdirectory(svc_launch)

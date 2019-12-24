@@ -1,28 +1,8 @@
 #pragma once
-//*****************************************************************************\
-// Copyright (c) 2019 lanyeo
-// All rights reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Author   : lanyeo
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 
 #include "os_macro.h"
 
@@ -34,25 +14,28 @@ typedef FARPROC LIBFUNC;
 #define INVALID_LIB_FUNC nullptr
 #define INVALID_LIB_HANDLE NULL
 
-#elif 
+#else
 
 #include <dlfcn.h>
+
+
 #define INVALID_LIB_HANDLE NULL
+#define INVALID_LIB_FUNC NULL
+
 typedef void* HDLIB;
 typedef void* LIBFUNC;
-#define INVALID_LIB_FUNC NULL
 
 #endif
 
 /* ¼ÓÔØÄ£¿é¶¯Ì¬¿â */
-inline HDLIB lib_load(const char* path)
+inline HDLIB lib_load(const char* name)
 #ifdef OS_WIN
 {
-    return LoadLibraryA(path);
+    return LoadLibraryA(name);
 }
-#elif
+#else
 {
-    return INVALID_LIB_HANDLE;
+    return dlopen(name, RTLD_NOW | RTLD_GLOBAL);
 }
 #endif
 
@@ -62,9 +45,9 @@ inline LIBFUNC lib_func(HDLIB lib_handle, const char* func_name)
 {
     return GetProcAddress(lib_handle, func_name);
 }
-#elif
+#else
 {
-    return NULL;
+    return dlsym(lib_handle, func_name);
 }
 #endif
 
@@ -72,12 +55,14 @@ inline LIBFUNC lib_func(HDLIB lib_handle, const char* func_name)
 inline void lib_free(HDLIB lib_handle)
 #ifdef OS_WIN
 {
-    if (lib_handle != INVALID_HANDLE_VALUE) {
+    if (lib_handle != INVALID_LIB_FUNC) {
         FreeLibrary(lib_handle);
     }
 }
-#elif
+#else
 {
-    
+    if (lib_handle != INVALID_LIB_FUNC) {
+        dlclose(lib_handle);
+    }
 }
 #endif

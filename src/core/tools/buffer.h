@@ -1,16 +1,8 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : buffer.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019年10月24日 12:00:00
-    *  @brief    : 
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
 
-#include <cstring>
+#include <core/safe/safe_function.h>
 
 
 /* 固定大小的缓冲区 */
@@ -33,14 +25,14 @@ struct fixed_buf final
         , used(0)
     {
         data = new char[LEN]();
-        memcpy_s(data, LEN * sizeof(char), _cp.data, _cp.LEN * sizeof(char));
+        safe_memcpy(data, LEN * sizeof(char), _cp.data, _cp.LEN * sizeof(char));
         used = _cp.used;
         offset = _cp.offset;
     }
     fixed_buf& operator =(const fixed_buf& _cp)
     {
         data = new char[LEN]();
-        memcpy_s(data, LEN * sizeof(char), _cp.data, _cp.LEN * sizeof(char));
+        safe_memcpy(data, LEN * sizeof(char), _cp.data, _cp.LEN * sizeof(char));
         used = _cp.used;
         offset = _cp.offset;
         return *this;

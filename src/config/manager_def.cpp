@@ -1,6 +1,5 @@
 #include "manager_def.h"
 #include <string>
-#include <core/module/rmi.h>
 
 //-----------------manager_interface------------------
 #include <core/net_msg/net_msg_interface.h>

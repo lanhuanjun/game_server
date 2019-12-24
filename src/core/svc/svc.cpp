@@ -1,5 +1,6 @@
 #include "svc.h"
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 #include <core/tools/gs_time.h>
 #include <core/svc_info/svc_info.h>
 #include <core/net_msg/net_msg_interface.h>
@@ -85,8 +86,7 @@ int __svc_run__(int argc, char* argv[])
 
     load_manager();
 
-    LOG(INFO) << "start svc begin-------------->" << svc_self_name();
-
+    LOG(INFO) << "start svc begin -------------->" << svc_self_name();
 
     /* 初始化各个组件 */
     for (auto && server : g_all_mng_server_ptr) {

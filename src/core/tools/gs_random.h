@@ -1,34 +1,15 @@
 #pragma once
-//*****************************************************************************\
-// Copyright (c) 2019 lanyeo
-// All rights reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Author   : lanyeo
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
 
 #include <cstdint>
+#include <climits>
 #include <cstring>
+#include <random>
 #include <glog/logging.h>
+#include <core/platform/os_macro.h>
 
-#ifdef _WIN32
+#ifdef OS_WIN
 
 #include <Windows.h>
 #include <bcrypt.h>
@@ -37,7 +18,6 @@
 #endif
 namespace gs
 {
-    
     /* 生成随机数 [begin, end) begin <= end*/
     inline uint32_t rand(const uint32_t& begin, const uint32_t& end)
     {
@@ -45,7 +25,7 @@ namespace gs
             return end;
         }
         uint32_t rand = 0;
-#ifdef _WIN32
+#ifdef OS_WIN
 
         BYTE buf[sizeof(uint32_t)];
         if (0 != BCryptGenRandom(nullptr, buf, sizeof(uint32_t), 0x00000002)) {
@@ -54,10 +34,12 @@ namespace gs
         else {
             memcpy_s(&rand, sizeof(uint32_t), buf, sizeof(uint32_t));
         }
-#elif
-
 #endif
 
+#ifdef OS_LINUX
+        FILE* rand_fd = fopen("/dev/urandom", "r");
+        fread(&rand, 1, sizeof(rand), rand_fd);
+#endif
         return rand % (end - begin) + begin;
     }
     /* 生成随机数 [0,INT_MAX) */

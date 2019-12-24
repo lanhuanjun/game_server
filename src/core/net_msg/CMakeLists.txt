@@ -1,0 +1,5 @@
+aux_source_directory(. SRC_LIST)
+set(CMAKE_DEBUG_POSTFIX _d)
+add_library(net_msg STATIC ${SRC_LIST})
+set(EXECUTABLE_OUTPUT_PATH ${INSTALL_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${INSTALL_DIR}/lib)
