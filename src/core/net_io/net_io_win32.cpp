@@ -1,3 +1,5 @@
+#ifdef OS_WIN
+
 #include "net_io_win32.h"
 #include <core/tools/gs_assert.h>
 
@@ -720,3 +722,5 @@ DWORD CNetIOWin32::SendDataThread(LPVOID p_net_cs)
     }
     return TRUE;
 }
+
+#endif

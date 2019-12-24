@@ -1,30 +1,10 @@
 #pragma once
-//*****************************************************************************\
-// Copyright (c) 2019 lanyeo
-// All rights reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Author   : lanyeo
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 #include <cstdint>
-#include "core/platform/os_macro.h"
+#include <core/platform/os_macro.h>
 #ifdef OS_WIN
 #include "Windows.h"
 #endif
@@ -67,18 +47,22 @@ inline sec_t now_time()
 }
 #else
 {
-    return 0;
+    return time(NULL);
 }
 #endif
 
 /* 获取开机的到此时的毫秒数 */
-inline msec_t svc_run_msec()
 #ifdef OS_WIN
+inline msec_t svc_run_msec()
 {
     return GetTickCount64();
 }
-#else
+#endif
+#ifdef OS_LINUX
+inline struct timespec g_svc_run_time_temp;
+inline msec_t svc_run_msec()
 {
-    return 0;
+    clock_gettime(CLOCK_MONOTONIC_COARSE, &g_svc_run_time_temp);
+    return (g_svc_run_time_temp.tv_sec * 1000 + g_svc_run_time_temp.tv_nsec / 1000000);
 }
 #endif

@@ -354,3 +354,8 @@ assist/annotation/.idea/*
 
 # third-party
 third-party/*
+
+build/third-party/*
+build/CMakeFiles/*
+build/src/*
+build_temp/*

@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{3812176B-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logic", "logic", "{1580FEFC-EFC9-4079-BCA2-E08B25183CE9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo", "projects\demo.vcxproj", "{B521501E-75DC-4212-A555-7F18C6ED66D2}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config", "projects\config.vcxproj", "{EE90ED7D-99A4-47BB-A7A1-D7FD5BD3DDF6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "module", "projects\module.vcxproj", "{4285C621-A61C-45F2-A13D-45D47D9B793B}"

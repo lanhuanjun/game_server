@@ -1,15 +1,6 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : ptr_map.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019年10月22日 12:00:00
-    *  @brief    : 根据 Key和 指针类型做一个映射管理
-    *              其中Key最好是int类型
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
 
 #include <unordered_map>
 

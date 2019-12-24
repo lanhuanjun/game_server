@@ -1,31 +1,9 @@
 #pragma once
-//*****************************************************************************\
-// Copyright (c) 2019 lanyeo
-// All rights reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Author   : lanyeo
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
 
 #include "stream.h"
-#include <core/tools/gs_assert.h>
+
 
 #include <cstdint>
 #include <vector>
@@ -34,6 +12,9 @@
 #include <unordered_set>
 #include <map>
 #include <unordered_map>
+
+#include <core/tools/gs_assert.h>
+#include <core/safe/safe_function.h>
 
 #define __BINARY_STREAM_BASE_TYPE__(TYPE)   \
 CBinaryStream& operator <<(const TYPE& v)   \
@@ -83,13 +64,16 @@ void __from__(IStream* stream) override                             \
     }                                                               \
 }                                                                   \
 
+
+
 class CBinaryStream : public IStream
 {
-    /* 默认初始容量大小 */
-    const static uint32_t __DEFAULT_CAPACITY = 128;
-    /* 每次增加的容量大小 */
-    const static uint32_t __INC_CAPACITY = 64;
 public:
+    /* 默认初始容量大小 */
+    inline const static uint32_t __DEFAULT_CAPACITY = 128;
+    /* 每次增加的容量大小 */
+    inline const static uint32_t __INC_CAPACITY = 64;
+
     
     explicit CBinaryStream(const unsigned int& cap = __DEFAULT_CAPACITY)
     {
@@ -104,7 +88,7 @@ public:
     explicit CBinaryStream(const char* data, const size_t& len)
     {
         m_buf = (char*)malloc(sizeof(char) * len);
-        memcpy_s(m_buf, sizeof(char) * len, data, sizeof(char) * len);
+        safe_memcpy(m_buf, sizeof(char) * len, data, sizeof(char) * len);
         m_cap = len;
         m_offset = 0;
         m_size = len;
@@ -119,7 +103,7 @@ public:
             m_buf = data;
         } else {
             m_buf = (char*)malloc(sizeof(char) * len);
-            memcpy_s(m_buf, sizeof(char) * len, data, sizeof(char) * len);
+            safe_memcpy(m_buf, sizeof(char) * len, data, sizeof(char) * len);
         }
         m_cap = len;
         m_offset = 0;
@@ -193,7 +177,7 @@ public:
             // 空间不够先申请空间
             reserve(len + m_size + __INC_CAPACITY);
         }
-        memcpy_s(m_buf + m_offset, m_cap - m_offset, data, len);
+        safe_memcpy(m_buf + m_offset, m_cap - m_offset, data, len);
         m_offset += len;
         m_size += len;
     }
@@ -203,7 +187,7 @@ public:
             LightAssert(0);
             return;
         }
-        memcpy_s(data, len, m_buf + m_offset, len);
+        safe_memcpy(data, len, m_buf + m_offset, len);
         m_offset += len;
     }
 public:

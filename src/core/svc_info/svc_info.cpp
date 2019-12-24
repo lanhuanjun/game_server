@@ -1,5 +1,6 @@
 #include "svc_info.h"
 #include "svc_cfg.h"
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <core/tools/gs_assert.h>
 
@@ -28,7 +29,6 @@ int __svc_info_init__(int argc, char* argv[])
     std::stringstream log_path;
     log_path << FLAGS_log_dir << FLAGS_SERVICE_TYPE << "_" << FLAGS_SERVICE_ID << ".";
     const std::string log_file_ext = log_path.str();
-
     google::SetLogDestination(google::GLOG_INFO, log_file_ext.c_str());
     google::SetLogDestination(google::GLOG_WARNING, log_file_ext.c_str());
     google::SetLogDestination(google::GLOG_ERROR, log_file_ext.c_str());
@@ -42,7 +42,6 @@ int __svc_info_init__(int argc, char* argv[])
     __svc_self_cfg__ = g_svc_cfg.FindSvcCfg(__svc_self_token__);
 
     AlwaysAssert(__svc_self_cfg__ != nullptr)
-
     return 0;
 }
 

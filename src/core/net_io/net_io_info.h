@@ -1,21 +1,15 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : net_io_info.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019Äê10ÔÂ23ÈÕ 12:00:00
-    *  @brief    : 
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 #include <cstdint>
 #include <string>
-#include "core/tools/buffer.h"
-#include "core/safe/safe_recycle_list.h"
-#include "core/safe/safe_list.h"
-#include "core/safe/safe_map.h"
-#include "core/platform/os_macro.h"
+#include <core/tools/buffer.h>
+#include <core/safe/safe_recycle_list.h>
+#include <core/safe/safe_list.h>
+#include <core/safe/safe_map.h>
+#include <core/platform/os_macro.h>
 
 #ifdef OS_WIN
 
@@ -28,6 +22,13 @@ typedef SOCKET net_link;
 
 #define INVALID_NET_LINK INVALID_SOCKET
 
+
+#else
+
+#include <sys/socket.h>
+
+typedef int net_link;
+#define INVALID_NET_LINK -1
 
 #endif
 
