@@ -1,7 +1,7 @@
 #pragma once
 // Copyright (c) 2019-2040 lanyeo
 // Licensed under the MIT license.
-
+#include <core/platform/os_macro.h>
 
 #ifdef OS_WIN
 
