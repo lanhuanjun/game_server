@@ -1,6 +1,7 @@
+#include "net_io_win32.h"
+
 #ifdef OS_WIN
 
-#include "net_io_win32.h"
 #include <core/tools/gs_assert.h>
 
 #define HEAP_ALLOC(s) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (s))
