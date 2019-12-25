@@ -350,12 +350,13 @@ MigrationBackup/
 .ionide/
 
 # idea
+
 assist/annotation/.idea/*
 
-# third-party
-third-party/*
+#vscode
+.vscode/*
 
-build/third-party/*
-build/CMakeFiles/*
-build/src/*
+#project
 build_temp/*
+build/bin/*
+build/logs/*
