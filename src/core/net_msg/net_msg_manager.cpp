@@ -29,10 +29,7 @@ CNetMsgManager::~CNetMsgManager()
 
 void CNetMsgManager::Init()
 {
-#ifdef OS_WIN
     m_net_io = lib_export();
-#endif
-
     m_net_io->SetListenPort(svc_self_net_listen_port());
     m_net_io->SetWorkThreadNum(svc_self_net_thread_num());
     m_net_io->Initiate();

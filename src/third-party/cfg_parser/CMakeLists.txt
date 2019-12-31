@@ -1,5 +1,6 @@
 aux_source_directory(. SRC_LIST)
+project(cfg_parser)
 set(CMAKE_DEBUG_POSTFIX _d)
-add_library(cfg_parser STATIC ${SRC_LIST})
+add_library(${PROJECT_NAME} STATIC ${SRC_LIST})
 set(EXECUTABLE_OUTPUT_PATH ${INSTALL_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${INSTALL_DIR}/lib)

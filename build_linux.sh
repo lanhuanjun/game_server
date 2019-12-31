@@ -31,8 +31,9 @@ function create_project_cmake_file()
     cmake_file_path=$1"/"CMakeLists.txt
     rm -f $cmake_file_path
     echo "aux_source_directory(. SRC_LIST)" >> $cmake_file_path
+    echo "project($2)" >> $cmake_file_path
     echo "set(CMAKE_DEBUG_POSTFIX _d)" >> $cmake_file_path
-    echo "add_library($2 STATIC \${SRC_LIST})" >> $cmake_file_path
+    echo "add_library(\${PROJECT_NAME} STATIC \${SRC_LIST})" >> $cmake_file_path
     echo "set(EXECUTABLE_OUTPUT_PATH \${INSTALL_DIR}/bin)" >> $cmake_file_path
     echo "set(LIBRARY_OUTPUT_PATH \${INSTALL_DIR}/lib)" >> $cmake_file_path
 }
@@ -79,7 +80,7 @@ function build_it()
         mkdir build_temp
     fi
     cd build_temp
-    cmake ..
+    cmake .. -DCMAKE_BUILD_TYPE=Debug
     # make clean
     make -j
     cd ..
@@ -100,7 +101,7 @@ function install_it()
 
 function main()
 {
-    generote_cmake_files src
+    # generote_cmake_files src
     build_it
     install_it
 }
