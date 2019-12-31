@@ -101,6 +101,7 @@ int __svc_run__(int argc, char* argv[])
     /* 调用消息处理模块 */
     auto p_net_msg_mng = dynamic_cast<INetMsgManager*>(svc_find_manager(ManagerShareInfo<INetMsgManager>::MNG_ID));
 
+    LOG_IF(ERROR, p_net_msg_mng == nullptr) << " net messgae is null!";
 
     p_net_msg_mng->RegMsgProc(NET_MSG_RPC, ManagerShareInfo<IRPCManager>::MNG_ID);
 

@@ -58,6 +58,8 @@ enum NetIOCode
     NET_CREATE_SOCKET_FAIL = 7,
     NET_UPDATE_IOCP_FAIL = 8,
     NET_CLIENT_CLOSED = 9,
+    NET_CREATE_EPOLL_FAIL = 10,
+    NET_LINK_BROKEN = 11,
 };
 
 enum NetIOOperation

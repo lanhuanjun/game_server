@@ -58,6 +58,7 @@ inline msec_t svc_run_msec()
     return GetTickCount64();
 }
 #endif
+
 #ifdef OS_LINUX
 inline struct timespec g_svc_run_time_temp;
 inline msec_t svc_run_msec()

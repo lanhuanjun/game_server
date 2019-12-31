@@ -37,11 +37,14 @@ int __svc_info_init__(int argc, char* argv[])
 
     __svc_self_token__ = SVC_TOKEN_MAKE(FLAGS_SERVICE_TYPE, FLAGS_SERVICE_ID);
 
+    LOG(INFO) << "self id:" << FLAGS_SERVICE_TYPE << " type:" << FLAGS_SERVICE_ID << " token:" << __svc_self_token__;
     g_svc_cfg.Load(CFG_FULL_PATH(cfg/svc_global_cfg.yaml));
 
     __svc_self_cfg__ = g_svc_cfg.FindSvcCfg(__svc_self_token__);
 
-    AlwaysAssert(__svc_self_cfg__ != nullptr)
+    LOG_IF(FATAL, __svc_self_cfg__ == NULL) << "can't find log config!";
+
+    LOG(INFO) << "svc init finish!";
     return 0;
 }
 
