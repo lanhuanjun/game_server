@@ -110,8 +110,8 @@ net_link CNetIOLinux::AddConnect(const std::string& ip, const uint16_t& port)
         return INVALID_NET_LINK;
     }
 
-    if (connect(link, (struct sockaddr*)(&sa), sizeof(sa)) <= 0) {
-        LOG(ERROR) << "connect fail! ip:" << ip << " port"<< port <<" err:" << errno;
+    if (connect(link, (struct sockaddr*)(&sa), sizeof(sa)) != 0) {
+        LOG(ERROR) << "connect fail! ip:" << ip << " port:"<< port <<" err:" << errno;
         close(link);
         return INVALID_NET_LINK;
     }
@@ -121,6 +121,7 @@ net_link CNetIOLinux::AddConnect(const std::string& ip, const uint16_t& port)
         close(link);
         return INVALID_NET_LINK;
     }
+    LOG(INFO) << "add link ok! link:" << link;
     return link;
 }
 
@@ -243,6 +244,7 @@ bool CNetIOLinux::AddSocketToEpoll(net_link sd)
     socket_ctx->link = sd;
 
     struct epoll_event event;
+    bzero(&event, sizeof(struct epoll_event));
     event.data.ptr = socket_ctx.ptr();
     event.events = EPOLLIN | EPOLLET;
     if (epoll_ctl(m_epoll, EPOLL_CTL_ADD, sd, &event) == -1) {
@@ -250,6 +252,8 @@ bool CNetIOLinux::AddSocketToEpoll(net_link sd)
         m_socket_ctx.recycle(socket_ctx);
         return false;
     }
+    m_link_map.insert({sd, socket_ctx.ptr()});
+    LOG(INFO) << "new client link. sd:" << link << " size:" << m_link_map.size();
     return true;
 }
 void CNetIOLinux::RecvDataThread(CNetIOLinux* pThis)
@@ -378,18 +382,12 @@ void CNetIOLinux::DoAccept()
         LOG(ERROR) << "set new link to noblocking fail! err:" << errno;
         return;
     }
-    struct epoll_event event;
-    bzero(&event, sizeof(struct epoll_event));
-    event.data.fd = link;
-    event.events = EPOLLIN | EPOLLET;
-    if (epoll_ctl(m_epoll, EPOLL_CTL_ADD, link, &event) != 0) {
-        LOG(ERROR) << "add link to epoll ctl fail! err:" << errno;
+    if (!AddSocketToEpoll(link)) {
+        close(link);
+        LOG(ERROR) << "accept link fail!";
         return;
     }
-    auto sk = m_socket_ctx.get_free_item();
-    sk.ptr()->link = link;
-    m_link_map.insert({link, sk.ptr()});
-    LOG(INFO) << "new client link. sd:" << link;
+    return;
 }
 void CNetIOLinux::SendDataThread(CNetIOLinux* pThis)
 {
@@ -399,6 +397,7 @@ void CNetIOLinux::SendDataThread(CNetIOLinux* pThis)
             pThis->m_send_cv.wait(lock);
             lock.unlock();
         }
+        LOG_IF(INFO, pThis->m_send_io.length() > 100) << "send data->size:" << pThis->m_send_io.length();
         while (!pThis->m_send_io.empty()) {
             auto back = pThis->m_send_io.back();
             pThis->DoWrite(back);
