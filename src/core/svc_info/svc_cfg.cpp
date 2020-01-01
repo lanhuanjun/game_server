@@ -19,6 +19,7 @@ svc_cfg_info* CSvcCfgParser::FindSvcCfg(const svc_token_t& token)
 {
     auto f_svc = m_svc.find(token);
     if (f_svc == m_svc.end()) {
+        LOG(ERROR) << " not find:" << token;
         return nullptr;
     }
     return &f_svc->second;

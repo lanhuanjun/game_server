@@ -1,14 +1,8 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : lib_export.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019Äê10ÔÂ30ÈÕ 12:00:00
-    *  @brief    : 
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 
 #include "os_macro.h"
 
@@ -16,4 +10,8 @@
 
 #define LIB_EXPORT __declspec(dllexport)
 
+#endif
+
+#ifdef OS_LINUX
+#define LIB_EXPORT
 #endif

@@ -1,14 +1,8 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : safe_map.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019Äê10ÔÂ27ÈÕ 12:00:00
-    *  @brief    : 
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 #include <map>
 #include <unordered_map>
 #include <mutex>

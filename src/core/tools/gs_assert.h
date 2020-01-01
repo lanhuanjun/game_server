@@ -1,14 +1,7 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : gs_assert.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019年10月27日 12:00:00
-    *  @brief    : 断言包装
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
 
 #include <cassert>
 #include <glog/logging.h>
@@ -23,15 +16,16 @@
 if (!(Expression))															  \
 {																			  \
 	LOG(FATAL) << "file:" << __FILE__ << " have error. line:" << __LINE__;	  \
-}																			  \
+}																			  
 
-#elif
+#else
 
-#define lightAssert(Expression)												  \
+#define LightAssert(Expression)												  \
 if (!(Expression))															  \
 {																			  \
 	LOG(ERROR) << "file:" << __FILE__ << " have error. line:" << __LINE__;	  \
-}
+}\
+
 
 #endif
 
@@ -39,4 +33,6 @@ if (!(Expression))															  \
 if (!(Expression))															  \
 {																			  \
 	LOG(FATAL) << "file:" << __FILE__ << " have error. line:" << __LINE__;	  \
-}
+}\
+
+

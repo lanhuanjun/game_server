@@ -16,14 +16,14 @@
     </BuildLog>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(GSSrcDir);$(GSDir)third-party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GSSrcDir);$(GSDir)third-party\win\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLOG_NO_ABBREVIATED_SEVERITIES;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <OutputFile>$(GSBuildDir)bin\$(TargetName)$(TargetExt)</OutputFile>
       <ProgramDatabaseFile>$(GSBuildDir)bin\$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>yaml-cppd.lib;gflags_debug.lib;glogd.lib;libgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(GSDir)third-party\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>yaml-cppd.lib;shlwapi.lib;gflags_static_debug.lib;glogd.lib;libgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GSDir)third-party\win\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

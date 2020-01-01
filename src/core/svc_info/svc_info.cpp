@@ -1,5 +1,6 @@
 #include "svc_info.h"
 #include "svc_cfg.h"
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <core/tools/gs_assert.h>
 
@@ -28,7 +29,6 @@ int __svc_info_init__(int argc, char* argv[])
     std::stringstream log_path;
     log_path << FLAGS_log_dir << FLAGS_SERVICE_TYPE << "_" << FLAGS_SERVICE_ID << ".";
     const std::string log_file_ext = log_path.str();
-
     google::SetLogDestination(google::GLOG_INFO, log_file_ext.c_str());
     google::SetLogDestination(google::GLOG_WARNING, log_file_ext.c_str());
     google::SetLogDestination(google::GLOG_ERROR, log_file_ext.c_str());
@@ -37,12 +37,14 @@ int __svc_info_init__(int argc, char* argv[])
 
     __svc_self_token__ = SVC_TOKEN_MAKE(FLAGS_SERVICE_TYPE, FLAGS_SERVICE_ID);
 
+    LOG(INFO) << "self id:" << FLAGS_SERVICE_TYPE << " type:" << FLAGS_SERVICE_ID << " token:" << __svc_self_token__;
     g_svc_cfg.Load(CFG_FULL_PATH(cfg/svc_global_cfg.yaml));
 
     __svc_self_cfg__ = g_svc_cfg.FindSvcCfg(__svc_self_token__);
 
-    AlwaysAssert(__svc_self_cfg__ != nullptr)
+    LOG_IF(FATAL, __svc_self_cfg__ == NULL) << "can't find log config!";
 
+    LOG(INFO) << "svc init finish!";
     return 0;
 }
 

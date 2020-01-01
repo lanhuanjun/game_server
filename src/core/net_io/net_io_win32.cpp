@@ -1,4 +1,7 @@
 #include "net_io_win32.h"
+
+#ifdef OS_WIN
+
 #include <core/tools/gs_assert.h>
 
 #define HEAP_ALLOC(s) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (s))
@@ -720,3 +723,5 @@ DWORD CNetIOWin32::SendDataThread(LPVOID p_net_cs)
     }
     return TRUE;
 }
+
+#endif

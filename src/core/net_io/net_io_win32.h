@@ -1,15 +1,9 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : net_io_win32.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019年10月24日 12:00:00
-    *  @brief    : 基于IOCP
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+#include <core/platform/os_macro.h>
 
+#ifdef OS_WIN
 
 #include "net_io_interface.h"
 
@@ -104,3 +98,5 @@ private:
     WSAEVENT m_read_event;
     WSAEVENT m_write_event;
 };
+
+#endif

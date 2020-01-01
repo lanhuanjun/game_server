@@ -1,14 +1,8 @@
 #pragma once
-/*****************************************************************************\
-    *  @COPYRIGHT NOTICE
-    *  @Copyright (c)2019 - 2030 lanyeo
-    *  @file	 : os_macro.h
-    *  @version  : ver 1.0
-    
-    *  @author   : lanyeo
-    *  @date     : 2019Äê10ÔÂ30ÈÕ 12:00:00
-    *  @brief    : 
-\*****************************************************************************/
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
+
+
 #ifdef _WIN32
 
 #define OS_WIN
@@ -22,8 +16,16 @@
 
 #endif
 
-#ifdef linux
+#ifdef __linux
 
 #define OS_LINUX
 
+#endif
+
+#ifdef __unix
+#define OS_UNIX
+#endif
+
+#ifdef __APPLE__
+#define OS_MAC
 #endif
