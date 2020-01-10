@@ -37,11 +37,9 @@ typedef int net_link;
 /* 最小的使用端口，需要使用大于此端口数 */
 #define MIN_TCP_IP_PORT 5000
 /* 消息默认缓冲大小 */
-#define NET_MSG_DEFAULT_BUFFER_SIZE 8192
+#define NET_MSG_DEFAULT_BUFFER_SIZE 10240
 /* 默认工作线程数，其中1个线程用于发送数据，其他线程用于建立连接和接收数据 */
 #define NET_DEFAULT_WORK_THREAD_NUM 2
-/* 最大工作线程数 */
-#define NET_MAX_WORK_THREAD_NUM 32
 /* 接收数据线程与发送线程的比例 X:1 */
 #define RECV_WORK_THREAD_RATIO 3
 
@@ -60,6 +58,7 @@ enum NetIOCode
     NET_CLIENT_CLOSED = 9,
     NET_CREATE_EPOLL_FAIL = 10,
     NET_LINK_BROKEN = 11,
+    NET_MSG_TOO_LARGE = 12,
 };
 
 enum NetIOOperation
@@ -70,4 +69,19 @@ enum NetIOOperation
     NET_IO_OPERATION_WRITE = 2,
 };
 
-typedef fixed_buf net_io_buf;
+typedef fixed_buf<NET_MSG_DEFAULT_BUFFER_SIZE> net_io_buf;
+
+inline const static uint32_t NET_MSG_MAX_LEN = NET_MSG_DEFAULT_BUFFER_SIZE * 10;
+typedef fixed_buf<NET_MSG_MAX_LEN> net_msg_buf;
+struct NetMsgBufList
+{
+    /* 用于写入记录data实际写入量*/
+    size_t count;
+    const static int32_t MAX_MSG_NUM = 50;
+    std::vector<net_msg_buf> data;
+    NetMsgBufList()
+        : count(0)
+    {
+        
+    }
+};

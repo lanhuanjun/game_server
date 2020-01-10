@@ -12,7 +12,7 @@
 /* 服务器连接检查时间 */
 const int32_t CONNECT_CHECK_TIME = 1000;
 /* 远程调用返回检查的最长时间 */
-const int32_t RPC_RETURN_CHECK_TIME = 1000 * 15;
+const int32_t RPC_RETURN_CHECK_TIME = 1000 * 5;
 
 
 MNG_IMPL(rpc, IRPCManager, CRPCManager)
@@ -34,7 +34,7 @@ void CRPCManager::Init()
 }
 void CRPCManager::Update()
 {
-    START_TASK std::bind(&CRPCManager::UpdateConnectPeer, this);
+    START_TASK(&CRPCManager::UpdateConnectPeer, this);
 }
 void CRPCManager::Destroy()
 {
@@ -69,10 +69,12 @@ void CRPCManager::RmiCall(const svc_token_t& to_svc, const mng_t& to_mng, const 
     request.from = svc_self_token();
     request.is_co = is_in_co();
 
-    safe_recycle_list<RMIRepData>::iterator* p_rep = nullptr;
+    RMIRepData* p_rep = nullptr;
     if (request.is_co) {
         // 用于匹配返回值
-        p_rep = m_rmi_rep.get_free_item()._Origin;
+        auto iter = m_rmi_rep.get_free_item();
+        iter->self = iter;
+        p_rep = &(*iter);
         request.p_node = (uint64_t)(p_rep);
     }
 
@@ -95,10 +97,10 @@ void CRPCManager::RmiCall(const svc_token_t& to_svc, const mng_t& to_mng, const 
     msec_t ret_check = svc_run_msec();
     while (svc_run_msec() - ret_check < RPC_RETURN_CHECK_TIME) {
         co_sleep(1);
-        if (p_rep->data()->is_back) {
-            ret.assign(p_rep->data()->data);
-            p_rep->data()->is_back = false;
-            m_rmi_rep.recycle(*p_rep);
+        if (p_rep->is_back) {
+            ret.assign(p_rep->data);
+            p_rep->is_back = false;
+            m_rmi_rep.recycle(p_rep->self);
             return;
         }
     }
@@ -184,10 +186,9 @@ void CRPCManager::ProcRmiReq(const net_link& link, const char* data, const size_
     }
     
     if (request.is_co) {
-        START_TASK std::bind(&CRPCManager::RmiImpl, this, request.to_mng, request.from, request.p_node,
+        START_TASK(&CRPCManager::RmiImpl, this, request.to_mng, request.from, request.p_node, 
             request.to_func, request.args, true);
-    }
-    else {
+    } else {
         RmiImpl(request.to_mng, request.from, request.p_node, request.to_func, request.args, false);
     }
 }
@@ -211,9 +212,14 @@ void CRPCManager::ProcRmiRep(const char* data, const size_t& len)
     CBinaryStream stream(data, len);
     stream >> response;
     if (svc_self_token() == response.target) {
-        auto p = (safe_recycle_list<RMIRepData>::iterator*)(response.p_node);
-        p->data()->data.assign(response.ret);
-        p->data()->is_back = true;
+        auto p = (RMIRepData*)(response.p_node);
+        if (p != nullptr) {
+            p->data.assign(response.ret);
+            p->is_back = true;
+        }
+        if (response.err != RPC_RET_OK) {
+            __rmi_set_last_err__(response.err);
+        }
         return;
     }
     // 不是目标服务器直接转发
@@ -308,6 +314,10 @@ void CRPCManager::RmiImpl(mng_t mng_id, svc_token_t req_svc, uint64_t req_id, in
     bool is_co)
 {
     auto p_rmi_com = svc_find_manager_server(mng_id);
+
+    if (p_rmi_com == nullptr) {
+        LOG(ERROR) << "can't find mng. id:" << mng_id;
+    }
 
     CEventRPCResponse response;
     response.target = req_svc;

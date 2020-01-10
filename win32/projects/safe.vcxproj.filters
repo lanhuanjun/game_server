@@ -4,7 +4,6 @@
     <ClInclude Include="..\..\src\core\safe\safe_list.h" />
     <ClInclude Include="..\..\src\core\safe\safe_recycle_list.h" />
     <ClInclude Include="..\..\src\core\safe\safe_map.h" />
-    <ClInclude Include="..\..\src\core\safe\list_node.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

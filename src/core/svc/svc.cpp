@@ -5,6 +5,7 @@
 #include <core/svc_info/svc_info.h>
 #include <core/net_msg/net_msg_interface.h>
 #include <core/rpc/rpc_interface.h>
+#include <core/platform/core_dump.h>
 
 
 /*core manager*/
@@ -82,6 +83,8 @@ void load_manager()
 
 int __svc_run__(int argc, char* argv[])
 {
+    init_mini_dump();
+
     global_init(argc, argv);
 
     load_manager();
@@ -113,7 +116,11 @@ int __svc_run__(int argc, char* argv[])
                     p_mng->Update();
                 }
             }
-            p_net_msg_mng->ProcMsg(svc_self_update_tick());
+            try {
+                p_net_msg_mng->ProcMsg(svc_self_update_tick());
+            } catch (const std::exception& ex) {
+                LOG(FATAL) << "err:" << ex.what();
+            }
         }
     } else {
         LOG(ERROR) << "not fund net_msg manager. please check your cfg.";

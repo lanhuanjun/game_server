@@ -18,7 +18,6 @@ struct MsgKey
 MNG_IMPL(net_msg, INetMsgManager, CNetMsgManager)
 CNetMsgManager::CNetMsgManager()
     : m_net_io(nullptr)
-    , m_msg_buf(INetIO::MSG_BUF_LEN)
 {
 }
 
@@ -34,6 +33,10 @@ void CNetMsgManager::Init()
     m_net_io->SetWorkThreadNum(svc_self_net_thread_num());
     m_net_io->Initiate();
     AlwaysAssert(m_net_io->Run() == NET_OK);
+    m_msg_buf.count = 0;
+    for (size_t i = 0; i < NetMsgBufList::MAX_MSG_NUM; ++i) {
+        m_msg_buf.data.emplace_back();
+    }
 }
 void CNetMsgManager::Update()
 {
@@ -52,26 +55,27 @@ void CNetMsgManager::RegMsgProc(int32_t msg_type, mng_t mng_id)
 }
 bool CNetMsgManager::ProcMsg(const uint32_t& time_out)
 {
-    m_msg_buf.reset();
     net_link link = INVALID_NET_LINK;
+    m_msg_buf.count = 0;
     if (!m_net_io->RecvData(link, m_msg_buf, time_out)) {
         return true;
     }
-    if (m_msg_buf.used < tlv_min_len<MsgKey>()) {
-        NET_MSG_LOG(WARNING) << "incomplete msg!";
-        return false;
+    for (size_t i = 0; i < m_msg_buf.count && i < NetMsgBufList::MAX_MSG_NUM; ++i) {
+        char* data = m_msg_buf.data[i].data;
+        if (tlv_len<MsgKey>(data) < tlv_min_len<MsgKey>()) {
+            NET_MSG_LOG(WARNING) << "incomplete msg! len:" << tlv_len<MsgKey>(data) <<  " min_len:"
+            << tlv_min_len<MsgKey>();
+            continue;
+        }
+        const int32_t& msg_type = tlv_type<MsgKey>(data).type;
+        auto msg_proc = m_msg_proc.find(msg_type);
+        if (m_msg_proc.end() == msg_proc) {
+            NET_MSG_LOG(ERROR) << "unknown msg type! " << msg_type;
+            continue;
+        }
+        msg_proc->second->ProcMessage(link, tlv_type<MsgKey>(data).id, tlv_val<MsgKey>(data), tlv_len<MsgKey>(data));
     }
-
-    const int32_t& msg_type = tlv_type<MsgKey>(m_msg_buf.data).type;
-
-    auto msg_proc = m_msg_proc.find(msg_type);
-    if (m_msg_proc.end() == msg_proc) {
-        NET_MSG_LOG(ERROR) << "unknown msg type! " << msg_type;
-        return false;
-    }
-
-    msg_proc->second->ProcMessage(link, tlv_type<MsgKey>(m_msg_buf.data).id, tlv_val<MsgKey>(m_msg_buf.data), 
-        tlv_len<MsgKey>(m_msg_buf.data));
+    
     return true;
 }
 bool CNetMsgManager::SendMsg(const net_link& link, const IMsg& msg)

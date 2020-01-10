@@ -124,9 +124,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\core\platform\core_dump.h" />
     <ClInclude Include="..\..\src\core\platform\lib_export.h" />
     <ClInclude Include="..\..\src\core\platform\lib_import.h" />
     <ClInclude Include="..\..\src\core\platform\os_macro.h" />
+    <ClInclude Include="..\..\src\core\platform\sys_last_err.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

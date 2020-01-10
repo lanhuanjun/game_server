@@ -36,10 +36,10 @@ struct RMIRepData
 {
     bool is_back;
     std::string data;
+    safe_recycle_list<RMIRepData>::iterator self;
     RMIRepData()
         : is_back(false)
     {
         
     }
-    SAFE_RECYCLE_LIST_NODE_DECLARE(RMIRepData)
 };

@@ -49,4 +49,7 @@ private:
 
     uint32_t err_count;
     uint32_t call_count;
+    uint32_t be_call;
+    msec_t m_last_tick;
+    int call_ser;
 };

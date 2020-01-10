@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <glog/logging.h>
 #include <core/platform/os_macro.h>
 
 /**
@@ -12,14 +13,15 @@
  */
 inline int safe_memcpy(void* det, size_t det_size, const void* src, size_t src_size)
 {
+    if (det == NULL || det_size == 0 || src == NULL || src_size == 0) {
+        LOG_IF(FATAL, true) << " safe_memcpy param err!";
+        return 0;
+    }
 #ifdef OS_WIN
     if (memcpy_s(det, det_size, src, src_size) ==0) {
         return det_size;
     }
 #endif
-    if (det == NULL || det_size == 0 || src == NULL || src_size == 0) {
-        return 0;
-    }
     if (det_size >= src_size) {
         memcpy(det, src, src_size);
         return src_size;
