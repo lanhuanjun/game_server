@@ -77,9 +77,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>GOOGLE_GLOG_DLL_DECL=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,9 +128,18 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\test\binary_stream_test.cpp" />
     <ClCompile Include="..\..\src\test\test.cpp" />
+    <ClCompile Include="..\..\src\test\test_buffer.cpp" />
+    <ClCompile Include="..\..\src\test\test_net_io.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\binary_stream_test.h" />
+    <ClInclude Include="..\..\src\test\test_buffer.h" />
+    <ClInclude Include="..\..\src\test\test_net_io.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="net_io.vcxproj">
+      <Project>{7149ca07-450c-479f-8849-4cac961c3493}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

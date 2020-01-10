@@ -6,13 +6,70 @@
 #ifdef OS_WIN
 
 #include "net_io_interface.h"
+#include <thread>
+#include <vector>
+#include <condition_variable>
+#include <mutex>
 
 struct PerIOCtx;
 struct PerSocketCtx;
+
+#define HEAP_ALLOC(s) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (s))
+#define HEAP_FREE(p)   HeapFree(GetProcessHeap(), 0, (p))
+
+template <typename T>
+class HeapAllocator
+{
+public:
+    typedef T           value_type;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef size_t      size_type;
+    typedef ptrdiff_t   difference_type;
+
+    template <typename U>
+    struct rebind
+    {
+        using other = HeapAllocator<U>;
+    };
+    constexpr HeapAllocator() noexcept {}
+
+    constexpr HeapAllocator(const HeapAllocator&) noexcept = default;
+
+    template <class _Other>
+    constexpr HeapAllocator(const HeapAllocator<_Other>&) noexcept {}
+
+    pointer allocate(size_type n, const void* hint = nullptr) {
+        return (pointer)HEAP_ALLOC(sizeof(T) * n);
+    }
+
+    void deallocate(pointer p, size_type n) {
+        HEAP_FREE(p);
+    }
+
+    void destroy(pointer p) {
+        HEAP_FREE(p);
+    }
+
+    pointer address(reference x) {
+        return (pointer)&x;
+    }
+
+    const_pointer address(const_reference x) {
+        return (const_pointer)&x;
+    }
+
+    size_type max_size() const {
+        return size_type(UINTMAX_MAX / sizeof(T));
+    }
+};
+
 class CNetIOWin32 : public INetIO
 {
-    using socket_ctx_iter = safe_recycle_list<PerSocketCtx>::iterator;
-    using io_ctx_iter = safe_recycle_list<PerIOCtx>::iterator;
+    using PerIOCtxIter = safe_recycle_list<PerIOCtx, HeapAllocator<PerIOCtx>>::iterator;
+    using PerSocketCtxIter = safe_recycle_list<PerSocketCtx, HeapAllocator<PerSocketCtx>>::iterator;
 public:
     CNetIOWin32();
     virtual ~CNetIOWin32();
@@ -22,12 +79,12 @@ public:
     int Initiate() override;
     int Run() override;
     net_link AddConnect(const std::string& ip, const uint16_t& port) override;
-    bool RecvData(net_link& socket, net_io_buf& recv_buf, const int32_t& time_out) override;
-    int SendData(const net_link& socket, const char* data, const size_t& data_size) override;
+    bool RecvData(net_link& socket, NetMsgBufList& recv_buf, const int32_t& time_out) override;
+    int SendData(const net_link& socket, const char* data, const uint32_t& data_size) override;
     void CleanUp() override;
-    static DWORD WINAPI RecvDataThread(LPVOID p_net_cs);
-    static DWORD WINAPI SendDataThread(LPVOID p_net_cs);
 private:
+    static void RecvDataThread(CNetIOWin32* pThis);
+    static void SendDataThread(CNetIOWin32* pThis);
     // 创建工作线程
     int CreateThread();
 
@@ -38,19 +95,19 @@ private:
     // 创建一个等待客户端连接的socket
     int CreateClientNetLink();
     // 处理连接事件
-    void DoAccept(PerIOCtx* p_io_ctx, DWORD io_size);
+    void DoAccept(PerIOCtxIter io_ctx, DWORD io_size);
     // 处理发送事件
-    void DoSend(PerIOCtx* p_io_ctx, DWORD io_size);
+    void DoSend(PerIOCtxIter io_ctx, DWORD io_size);
     // 处理读取事件
-    void DoRead(PerIOCtx* p_io_ctx, DWORD io_size);
+    void DoRead(PerIOCtxIter io_ctx, DWORD io_size);
 
     /* 发送一个读取事件 */
-    bool PostRead(socket_ctx_iter& socket_ctx);
+    bool PostRead(PerSocketCtxIter socket_ctx);
 
     /* 发送一个写入事件
      * offset:相对于发送数据的基址偏移
      */
-    bool PostWrite(io_ctx_iter& io_ctx, const size_t& offset = 0);
+    bool PostWrite(PerIOCtxIter io_ctx, const size_t& offset = 0);
 
     /* 关闭一个client连接 */
     void CloseLink(net_link link);
@@ -61,42 +118,39 @@ private:
     // 监听端口
     uint16_t m_port;
 
-    // 工作线程数量
+    uint32_t m_recv_thread_num;
     uint32_t m_work_thread_num;
 
-    // 接收线程数量
-    uint32_t m_recv_work_thread_num;
-
     // 工作线程
-    HANDLE m_work_threads[NET_MAX_WORK_THREAD_NUM];
-
-    // 临界区
-    CRITICAL_SECTION m_critical_section;
+    std::vector<std::thread> m_work_threads;
 
     // 监听socket
     net_link m_listen;
 
     // 所有连接的socket
-    safe_recycle_list<PerSocketCtx> m_socket_ctx;
+    safe_recycle_list<PerSocketCtx, HeapAllocator<PerSocketCtx>> m_socket_ctx;
 
     // 所有的IO
-    safe_recycle_list<PerIOCtx> m_io_ctx;
+    safe_recycle_list<PerIOCtx, HeapAllocator<PerIOCtx>> m_io_ctx;
 
     // 等待处理的用户数据
-    safe_list<io_ctx_iter> m_wait_detail;
-
+    std::mutex m_recv_mx;
+    std::condition_variable m_recv_cv;
+    std::list<PerSocketCtxIter> m_wait_detail;
+    
     // 等待发送的用户数据
-    safe_list<io_ctx_iter> m_wait_send;
+    std::mutex m_send_mx;
+    std::condition_variable m_send_cv;
+    std::list<PerIOCtxIter> m_wait_send;
 
     // 服务结束
     bool m_finish;
 
     // 客户端连接
-    safe_map<net_link, socket_ctx_iter, false> m_active_link;
+    safe_map<net_link, PerSocketCtxIter, false> m_active_link;
 
-    // 读写控制
-    WSAEVENT m_read_event;
-    WSAEVENT m_write_event;
+    const static uint32_t TEMP_BUFFER_LEN = (NET_MSG_DEFAULT_BUFFER_SIZE * 10);
+    char m_temp_buf[TEMP_BUFFER_LEN];
 };
 
 #endif

@@ -34,8 +34,7 @@ public:
 private:
     MsgProcMap m_msg_proc;
     INetIO* m_net_io;
-    fixed_buf m_msg_buf;
-
+    NetMsgBufList m_msg_buf;
 };
 
 

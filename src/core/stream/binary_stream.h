@@ -13,6 +13,7 @@
 #include <map>
 #include <unordered_map>
 
+#include <glog/logging.h>
 #include <core/tools/gs_assert.h>
 #include <core/safe/safe_function.h>
 
@@ -24,7 +25,7 @@ CBinaryStream& operator <<(const TYPE& v)   \
 }                                           \
 CBinaryStream& operator <<(const TYPE* v)   \
 {                                           \
-    AlwaysAssert(v != nullptr);             \
+    LOG_IF(FATAL, v == nullptr);            \
     write((char*)v, sizeof(TYPE));          \
     return *this;                           \
 }                                           \
@@ -36,7 +37,7 @@ CBinaryStream& operator >>(TYPE& v)         \
 }                                           \
 CBinaryStream& operator >>(TYPE* v)         \
 {                                           \
-    AlwaysAssert(v != nullptr);             \
+    LOG_IF(FATAL, v == nullptr);            \
     write((char*)v, sizeof(TYPE));          \
     return *this;                           \
 }                                           \
@@ -184,7 +185,6 @@ public:
     void read(char* data, const size_t& len) override
     {
         if (m_offset > m_size) {
-            LightAssert(0);
             return;
         }
         safe_memcpy(data, len, m_buf + m_offset, len);
@@ -202,7 +202,6 @@ public:
     template <typename T>
     CBinaryStream& operator <<(const T* v)
     {
-        AlwaysAssert(v != nullptr);
         v->__to__((IStream*)this);
         return *this;
     }
@@ -215,7 +214,6 @@ public:
     template <typename T>
     CBinaryStream& operator >>(T* v)
     {
-        AlwaysAssert(v != nullptr);
         v->__from__((IStream*)this);
         return *this;
     }
@@ -238,7 +236,9 @@ public:
     CBinaryStream& operator <<(const std::string& val)
     {
         *this << val.length();
-        write(val.data(), val.length());
+        if (val.length() > 0) {
+            write(val.data(), val.length());
+        }
         return *this;
     }
     CBinaryStream& operator >>(std::string& val)

@@ -53,12 +53,12 @@ public:
      * time_out 超时时间,单位毫秒, 小于0表示永不超时，一直阻塞进行执行
      * return true有数据，false没有数据
      */
-    virtual bool RecvData(net_link& socket, net_io_buf& recv_buf, const int32_t& time_out = -1) = 0;
+    virtual bool RecvData(net_link& socket, NetMsgBufList& recv_buf, const int32_t& time_out = -1) = 0;
 
     /**
      * 发送数据到某个socket
      */
-    virtual int SendData(const net_link& socket, const char* data, const size_t& data_size) = 0;
+    virtual int SendData(const net_link& socket, const char* data, const uint32_t& data_size) = 0;
     /**
      * 清理网络环境
      */

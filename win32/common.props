@@ -22,7 +22,7 @@
     <Link>
       <OutputFile>$(GSBuildDir)bin\$(TargetName)$(TargetExt)</OutputFile>
       <ProgramDatabaseFile>$(GSBuildDir)bin\$(TargetName).pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>yaml-cppd.lib;shlwapi.lib;gflags_static_debug.lib;glogd.lib;libgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dbghelp.lib;ws2_32.lib;yaml-cppd.lib;shlwapi.lib;gflags_static_debug.lib;glogd.lib;libgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(GSDir)third-party\win\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

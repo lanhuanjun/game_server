@@ -272,30 +272,8 @@ private:
 
     TABLE = "    "
     LISENCE = """#pragma once
-//*****************************************************************************\
-// Copyright (c) 2019 lanyeo
-// All rights reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Author   : lanyeo
+// Copyright (c) 2019-2040 lanyeo
+// Licensed under the MIT license.
 
 // 本文件由工具自动生成, 请勿修改
 
@@ -364,9 +342,10 @@ private:
         ret_not_void = (func.ret_type != "void")
         if ret_not_void:
             s += RmiFile.TABLE * 2 + func.ret_type + " __return_val__ = { 0 };\n"
+        s += RmiFile.TABLE * 2 + "if (is_in_co() && rmi_last_err() == RMI_CODE_OK) {\n"
         if ret_not_void or len(func.params):
-            s += RmiFile.TABLE * 2 + "CBinaryStream retStream(retData.data(), retData.length());\n"
-        der_str = RmiFile.TABLE * 2 + "retStream"
+            s += RmiFile.TABLE * 3 + "CBinaryStream retStream(retData.data(), retData.length());\n"
+        der_str = RmiFile.TABLE * 3 + "retStream"
         need_der = False
         # 反序列化返回值
         if ret_not_void:
@@ -379,6 +358,7 @@ private:
                 need_der = True
         if need_der:
             s += der_str + ";\n"
+        s += RmiFile.TABLE * 2 + "}\n"
         if ret_not_void:
             s += RmiFile.TABLE * 2 + "return __return_val__;\n"
         s += RmiFile.TABLE + "}\n"
