@@ -6,6 +6,7 @@
 #include <climits>
 #include <cstring>
 #include <random>
+#include <random>
 #include <glog/logging.h>
 #include <core/platform/os_macro.h>
 
@@ -18,6 +19,9 @@
 #endif
 namespace gs
 {
+#ifdef OS_LINUX
+    inline std::random_device g_linux_rand_dv;
+#endif
     /* 生成随机数 [begin, end) begin <= end*/
     inline uint32_t rand(const uint32_t& begin, const uint32_t& end)
     {
@@ -37,8 +41,7 @@ namespace gs
 #endif
 
 #ifdef OS_LINUX
-        FILE* rand_fd = fopen("/dev/urandom", "r");
-        fread(&rand, 1, sizeof(rand), rand_fd);
+        rand = g_linux_rand_dv();
 #endif
         return rand % (end - begin) + begin;
     }

@@ -83,7 +83,9 @@ void load_manager()
 
 int __svc_run__(int argc, char* argv[])
 {
+#ifdef OS_WIN
     init_mini_dump();
+#endif
 
     global_init(argc, argv);
 
