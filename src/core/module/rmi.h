@@ -24,6 +24,7 @@ public:
     virtual int RmiExec(const int32_t& func_id, const std::string& args, std::string& res) override
     {
         AlwaysAssert(0);
+        return 0;
     }
     virtual void Init() override
     {

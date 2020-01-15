@@ -34,7 +34,7 @@ void CRoleManager::Update()
         
     }
     
-    if (svc_self_token() != SVC_TOKEN_MAKE(1, 1) && svc_run_msec() - m_last_call > 1000) {
+    if (svc_self_token() != SVC_TOKEN_MAKE(1, 1) /* && svc_run_msec() - m_last_call > 10 */) {
         m_last_call = svc_run_msec();
         START_TASK(&CRoleManager::TestCall, this);
     }

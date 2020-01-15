@@ -42,7 +42,7 @@ int __svc_info_init__(int argc, char* argv[])
 
     __svc_self_cfg__ = g_svc_cfg.FindSvcCfg(__svc_self_token__);
 
-    LOG_IF(FATAL, __svc_self_cfg__ == NULL) << "can't find log config!";
+    LOG_IF(FATAL, __svc_self_cfg__ == NULL) << "can't find svc config!";
 
     LOG(INFO) << "svc init finish!";
     return 0;

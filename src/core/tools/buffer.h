@@ -184,7 +184,6 @@ public:
         if (_i_read == _i_write) {
             return ;
         }
-
         if (_i_read < _i_write) {
             if (_i_write - _i_read < _size) {
                 _size = _i_write - _i_read;
