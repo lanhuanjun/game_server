@@ -1,7 +1,6 @@
 #include "manager_def.h"
 #include <string>
 
-//-----------------manager_interface------------------
 #include <core/net_msg/net_msg_interface.h>
 #include <core/rpc/rpc_interface.h>
 #include <logic/role/role_interface.h>

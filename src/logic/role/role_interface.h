@@ -16,12 +16,10 @@ class IRoleManager : public IManager
 public:
 
     /*
-     *
-     * rmi test function //
+     * rmi test
      */
     Annotation(@RMI)
     virtual int RmiTest_Add(int a, int b) = 0;
-    virtual void RmiTest_Ref(int a, int b, std::string& ret) = 0; // test---
 };
 MNG_DEF(role, IRoleManager)
 
