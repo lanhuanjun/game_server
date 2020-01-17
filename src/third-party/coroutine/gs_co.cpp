@@ -4,8 +4,6 @@
 
 static co::Scheduler* __co_instance__ = nullptr;
 
-
-
 co::Scheduler* co_create()
 {
     if (__co_instance__ == nullptr) {
