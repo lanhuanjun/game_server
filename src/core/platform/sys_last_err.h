@@ -14,7 +14,7 @@ inline int32_t sys_last_err()
 {
 #ifdef OS_WIN
     return GetLastError();
-#elif OS_LINUX
+#elif defined(OS_LINUX)
     return errno;
 #endif
     return 0;

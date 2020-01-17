@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <core/tools/buffer.h>
 #include <core/safe/safe_recycle_list.h>
 #include <core/safe/safe_list.h>

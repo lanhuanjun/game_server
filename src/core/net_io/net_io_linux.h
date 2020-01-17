@@ -9,16 +9,21 @@
 
 #include <thread>
 #include <mutex>
+#include <vector>
 #include <condition_variable>
-#include <sys/epoll.h>
+
 #include <core/safe/safe_list.h>
 #include <core/safe/safe_recycle_list.h>
 #include <core/safe/safe_map.h>
+
+typedef int32_t epoll_t;
 
 class PerIOCtx;
 class PerSocketCtx;
 class CNetIOLinux : public INetIO
 {
+    using PerIOCtxIter = safe_recycle_list<PerIOCtx>::iterator;
+    using PerSocketCtxIter = safe_recycle_list<PerSocketCtx>::iterator;
 public:
     CNetIOLinux();
     ~CNetIOLinux();
@@ -62,44 +67,70 @@ public:
      * time_out 超时时间,单位毫秒, 小于0表示永不超时，一直阻塞进行执行
      * return true有数据，false没有数据
      */
-    bool RecvData(net_link& socket, net_io_buf& recv_buf, const int32_t& time_out = -1) override;
+    bool RecvData(net_link& socket, NetMsgBufList& recv_buf, const int32_t& time_out = -1) override;
 
     /**
      * 发送数据到某个socket
      */
-    int SendData(const net_link& socket, const char* data, const size_t& data_size) override;
+    int SendData(const net_link& socket, const char* data, const uint32_t& data_size) override;
     /**
      * 清理网络环境
      */
     void CleanUp() override;
 
-    static void RecvDataThread(CNetIOLinux* pThis);
+    static void AcceptThread(CNetIOLinux* pThis);
+    static void RecvDataThread(CNetIOLinux* pThis, epoll_t epoll);
     static void SendDataThread(CNetIOLinux* pThis);
 private:
-    bool CreateEpollHandle();
+    bool CreateAcceptEpoll();
+    bool CreateRecvEpoll();
     bool CreateListenSocket();
+    bool CreateThread();
     bool SetSocketNonblocking(net_link sd);
-    bool AddSocketToEpoll(net_link sd);
-    void DoError(PerSocketCtx* pSd);
-    void DoRead(PerSocketCtx* pSd);
-    void DoWrite(PerIOCtx* pIO);
+    bool AddSocketToEpoll(net_link sd, epoll_t epoll);
+    void DoError(PerSocketCtxIter sd_ctx);
+    void DoRead(PerSocketCtxIter sd_ctx);
+    void PostRead(PerSocketCtxIter sd_ctx);
+    void DoWrite(PerIOCtxIter io_ctx);
     void DoAccept();
 private:
+    /* 监听的本地端口 */
     uint16_t m_port;
-    int m_epoll;
+
     net_link m_listen;
-    std::thread m_recv_data;
-    std::thread m_send_data;
-    safe_list<PerIOCtx> m_recv_io;
-    safe_list<PerIOCtx> m_send_io;
+
+    /* accept m_epoll */
+    epoll_t m_epoll;
+    std::thread m_accept;
+
+    /* 接收数据的accept */
+    std::vector<epoll_t> m_recv_epoll;
+
+    /* 发送和接收数据的线程总数 */
+    uint32_t m_thread_num;
+
+    /* 接收数据的数量 */
+    uint32_t m_recv_thread_num;
+
+
+    std::vector<std::thread> m_recv_data;
+    std::vector<std::thread> m_send_data;
+
     safe_recycle_list<PerIOCtx> m_io_ctx;
     safe_recycle_list<PerSocketCtx> m_socket_ctx;
-    safe_map<net_link, PerSocketCtx*, true> m_link_map;
 
-    std::mutex m_send_mx;
-    std::condition_variable m_send_cv;
+    safe_map<net_link, PerSocketCtxIter, true> m_link_map;
+
+    /* 待处理数据的socket */
+    std::list<PerSocketCtxIter> m_recv_sd;
     std::mutex m_recv_mx;
     std::condition_variable m_recv_cv;
+
+    /* 需要发送的数据 */
+    std::list<PerIOCtxIter> m_send_io;
+    std::mutex m_send_mx;
+    std::condition_variable m_send_cv;
+    
 };
 
 #endif
